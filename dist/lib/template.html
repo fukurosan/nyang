@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>NYANG</title>
+    <style>
+        html,
+        body,
+        main {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+            font-family: -apple-system, BedgeMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+
+        h1,
+        h2 {
+            color: #ffffff;
+        }
+
+        .row {
+            display: flex;
+            height: 100%;
+            flex-direction: row;
+            margin: 0;
+        }
+
+        .main-area {
+            flex: 6;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-area {
+            flex: 1;
+            background-color: #e6e7e8;
+        }
+
+        .bottom-bar-area {
+            height: 80px;
+            background-color: gray;
+            padding-left: 2em;
+        }
+
+        .sidebar-area {
+            background-color: #3e3e3f;
+            min-width: 300px;
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            box-shadow: 3px 0px 7px 2px rgba(0, 0, 0, 0.5);
+            transform: translateX(0);
+            transition: transform 0.3s ease-out;
+        }
+
+        .sidebar-inner-area {
+            overflow-y: auto;
+            height: 100%;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .control-panel-button {
+            margin-right: 95%;
+            top: 40%;
+            width: 130px;
+            height: 55px;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            position: absolute;
+            cursor: pointer;
+            background-color: lightgray;
+            text-align: center;
+            transform: rotate(90deg);
+            color: white;
+            box-shadow: 3px 0px 7px -2px rgba(0, 0, 0, 0.5);
+            right: -4%;
+        }
+
+        .control-panel-button p {
+            margin-bottom: 3px;
+            text-align: center;
+        }
+
+        #nyang-container {
+            height: 100%;
+            box-sizing: border-box;
+            margin: 0;
+            overflow: hidden;
+            padding: 0;
+            width: 100%;
+            display: flex;
+            flex: auto;
+        }
+
+        .nyang-button {
+            cursor: pointer;
+            color: #000000;
+            background-color: #ffffff;
+            display: inline-block;
+            border: 1px solid transparent;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: .25rem;
+            transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+            margin: 0;
+            width: 100%;
+        }
+
+        .nyang-button:hover {
+            color: #fff;
+            background-color: #2A6D91;
+            border-color: #2A6D91;
+        }
+
+        .text-input {
+            display: block;
+            width: 100%;
+            height: calc(1.5em + .75rem + 2px);
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            color: #495057;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            box-sizing: border-box;
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div class="row">
+            <div class="main-area">
+                <div class="graph-area">
+                    <div id="nyang-container"></div>
+                </div>
+                <div class="bottom-bar-area">
+                    <h2>NYANG - Not Your Average Network Graph (Development)</h2>
+                </div>
+            </div>
+            <div class="sidebar-area">
+                <div class="sidebar-inner-area">
+                    <div class="control-panel-button" onclick="toggleControlPanel()">
+                        <p>Control Panel</p>
+                    </div>
+                    <h1 style="text-align:center;">Control Panel</h1>
+                    <hr />
+                    <div>
+                        <h2>Filter</h2>
+                        <button class="nyang-button" style="margin-bottom:0.5em;" onclick="filterThing()">Filter
+                            Literal</button>
+                        <button class="nyang-button" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                    <hr />
+                    <div>
+                        <h2>Multiplicity</h2>
+                        <button class="nyang-button" onclick="toggleMultiplicity()">Toggle Multiplicity</button>
+                    </div>
+                    <hr />
+                    <div>
+                        <h2>Highlight Search</h2>
+                        <input type="text" id="search-input" class="text-input"
+                            placeholder="Highlight... (try 'person')" />
+                        <button class="nyang-button" onclick="highlight()">Search</button>
+                    </div>
+                    <hr />
+                    <div>
+                        <h2>Zoom</h2>
+                        <input type="text" id="zoom-nodeid" class="text-input"
+                            placeholder="Zoom To Node... (try 'n35')" />
+                        <button class="nyang-button" style="margin-bottom:0.5em;" onclick="zoomToNode()">Zoom To
+                            Node</button>
+                        <button class="nyang-button" onclick="resetZoom()">Reset Zoom</button>
+                    </div>
+                    <hr />
+                    <div>
+                        <h2>Layouts</h2>
+                        <button class="nyang-button" style="margin-bottom:0.5em;" onclick="setGridLayout()">Group
+                            Layout</button>
+                        <button class="nyang-button" style="margin-bottom:0.5em;" onclick="setMatrixLayout()">Matrix
+                            Layout</button>
+                        <button class="nyang-button" onclick="resetLayout()">Reset Layout</button>
+                    </div>
+                    <hr />
+                    <div>
+                        <h2>Center Node</h2>
+                        <input type="text" id="center-nodeid" class="text-input"
+                            placeholder="Center Node... (try 'n35')" />
+                        <button class="nyang-button" onclick="centerNode()">Center Node</button>
+                    </div>
+                    <hr />
+                    <div>
+                        <h2>Destroy Graph</h2>
+                        <button class="nyang-button" style="margin-bottom:2em;" onclick="destroyGraph()">Destroy
+                            Graph</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        window.onload = function () {
+            const xhttp = new XMLHttpRequest()
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    const graphContainer = document.getElementById("nyang-container")
+                    const data = JSON.parse(this.responseText)
+                    const options = {
+                        entityClickedListener: function (item) {
+                            console.log("Clicked:", item)
+                        },
+                        entityHoveredListener: function (item) {
+                            console.log(item)
+                        },
+                        entityDoubleClickedListener: function (item) {
+                            console.log("Double clicked:", item)
+                        },
+                        rotateLabels: true,
+                        enableGrid: true,
+                        enableMultiLineNodeLabels: true,
+                        enableFixedEdgeLabelWidth: true,
+                        maxEdgeLabelWidth: 130,
+                        edgeLabelWidth: 80,
+                        enableZoomButtons: true,
+                        enableContextMenu: true,
+                        enableFadeOnHover: false,
+                        customContextMenuAddons: {
+                            node: [
+                                [
+                                    {
+                                        label: "Implode Node",
+                                        action: (data, id) => {
+                                            window.graph.implodeOrExplodeNode(id, true)
+                                        }
+                                    },
+                                    {
+                                        label: "Implode Node Leafs",
+                                        action: (data, id) => {
+                                            window.graph.implodeOrExplodeNodeLeafs(id, true)
+                                        }
+                                    },
+                                    {
+                                        label: "Implode Node Recursive",
+                                        action: (data, id) => {
+                                            window.graph.implodeOrExplodeNodeRecursive(id, true)
+                                        }
+                                    },
+                                    {
+                                        label: "Implode Node non-circular",
+                                        action: (data, id) => {
+                                            window.graph.implodeOrExplodeNodeNonCircular(id, true)
+                                        }
+                                    }
+                                ],
+                                [
+                                    {
+                                        label: "Explode Node",
+                                        action: (data, id) => {
+                                            window.graph.implodeOrExplodeNode(id, false)
+                                        }
+                                    },
+                                    {
+                                        label: "Explode Node Recursive",
+                                        action: (data, id) => {
+                                            window.graph.implodeOrExplodeNodeRecursive(id, false)
+                                        }
+                                    },
+                                ]
+                            ]
+                        }
+                    }
+                    window.graph = new NYANG(graphContainer, data, options)
+                }
+            }
+            xhttp.open("GET", "./data/FOAF.json", true)
+            xhttp.send()
+        }
+
+        function filterThing() {
+            window.graph.setFilters([
+                { entityType: "node", attribute: "type", value: "literal" }
+            ])
+        }
+
+        function clearFilters() {
+            window.graph.resetAllFilters()
+
+        }
+
+        function toggleMultiplicity() {
+            window.graph.toggleMultiplicity()
+        }
+
+        function highlight() {
+            const value = document.getElementById("search-input").value
+            if (value && value.length >= 3) {
+                window.graph.highlight("name", value)
+            }
+        }
+
+        function zoomToNode() {
+            const value = document.getElementById("zoom-nodeid").value
+            if (value) {
+                window.graph.zoomToNode(value)
+            }
+        }
+
+        function resetZoom() {
+            window.graph.resetZoom()
+        }
+
+        function setGridLayout() {
+            window.graph.setMatrixLayout("type")
+        }
+
+        function setMatrixLayout() {
+            window.graph.setMatrixLayout("id")
+        }
+
+        function resetLayout() {
+            window.graph.resetLayout()
+        }
+
+        function destroyGraph() {
+            window.graph.destroyGraph()
+        }
+
+        function toggleControlPanel() {
+            const panel = document.getElementsByClassName("sidebar-area")[0]
+            if (panel.style.transform) {
+                panel.style.transform = null
+            }
+            else {
+                panel.style.transform = "translateX(100%)"
+            }
+        }
+
+        function centerNode() {
+            const value = document.getElementById("center-nodeid").value
+            if (value) {
+                window.graph.centerNode(value)
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>
