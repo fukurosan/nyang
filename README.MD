@@ -5,13 +5,14 @@ I developed a network graph for [Ortelius](https://www.ortelius.com) called virr
 
 This repository is a personal version that I keep of the graph to experiment and play around with. For more professional use I strongly suggest you stick to Virrvarr.
 
+<div align="center">
+  <a target="_blank" href="https://fukurosan.github.io/nyang/dist/index.html">Demo</a> | <a target="_blank" href="https://fukurosan.github.io/nyang/docs/dist/index.html">Documentation</a>
+</div>
+
 ## What is this?
 This is a network graph. Using some basic input criteria this library visualizes complex structures and exposes an API to traverse, filter, position, interact and graphically customize said visualization.
 
 The point of this library is to create a powerful yet super simple to use network graph that can be easily configured and customized for different implementations, with a generic data input format as well as an API to build interactions.
-
-Check out a demo [here](https://fukurosan.github.io/nyang/dist/index.html).
-Check out the documentation [here](https://fukurosan.github.io/nyang/docs/dist/index.html).
 
 ## For developers
 
