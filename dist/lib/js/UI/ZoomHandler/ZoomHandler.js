@@ -23,6 +23,7 @@ class ZoomHandler {
     this.ee.on(_EventEnum.default.ZOOM_REQUESTED, (x, y, scale) => {
       this.handleZoomRequest(x, y, scale);
     });
+    this.ee.on(_EventEnum.default.GRAPH_WILL_UNMOUNT, () => this.destroy());
     this.zoom = d3.zoom().scaleExtent(_Env.default.SCALE_EXTENT).on("zoom", () => {
       const rootG = d3.select(this.graphContainerElement).select("g");
       rootG.attr("transform", d3.event.transform);
@@ -30,11 +31,14 @@ class ZoomHandler {
 
     if (this.enableZoomButtons) {
       this.initializeZoomButtons();
+    } else {
+      this.zoomButtonContainer = null;
     }
   }
 
   initializeZoomButtons() {
-    const zoomButtons = d3.select(this.graphContainerElement).append("div").attr("style", "position:relative;").append("svg").attr("style", "position:absolute;height:60px;width:30px;right:15px;bottom:15px;").append("g").attr("class", "NYANG-zoom-controls").attr("style", "cursor:pointer;");
+    this.zoomButtonContainer = d3.select(this.graphContainerElement).append("div").attr("style", "position:relative;");
+    const zoomButtons = this.zoomButtonContainer.append("svg").attr("style", "position:absolute;height:60px;width:30px;right:15px;bottom:15px;").append("g").attr("class", "NYANG-zoom-controls").attr("style", "cursor:pointer;");
     zoomButtons.append("g").on('click', () => {
       this.scaleBy(1.5);
     }).attr("class", "NYANG-zoom-in").attr("transform", "translate(0, 0)").append("rect").attr("style", "fill: white;stroke: #596877;stroke-width:1;").attr("width", "30").attr("height", "30").select(function () {
@@ -87,6 +91,12 @@ class ZoomHandler {
       this.zoomToCoordinates(x, y, scale);
     } else {
       this.resetZoom();
+    }
+  }
+
+  destroy() {
+    if (this.zoomButtonContainer) {
+      this.zoomButtonContainer.remove();
     }
   }
 

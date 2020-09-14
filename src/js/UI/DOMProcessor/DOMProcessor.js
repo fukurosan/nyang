@@ -109,10 +109,10 @@ export default class DOMProcessor {
                 })
                 .each((d, i, c) => {
                     if (d.multiplicityFrom) {
-                        this.drawMultiplicity(d3.select(c[i]), "to")
+                        this.drawMultiplicity(d3.select(c[i]), "from")
                     }
                     if (d.multiplicityTo) {
-                        this.drawMultiplicity(d3.select(c[i]), "from")
+                        this.drawMultiplicity(d3.select(c[i]), "to")
                     }
                 })
         }
@@ -192,7 +192,9 @@ export default class DOMProcessor {
                 if (d.nameFrom) {
                     this.drawLabel(d3.select(c[i]), d, "from")
                 }
-                this.drawLabel(d3.select(c[i]), d, "to")
+                if (d.nameTo) {
+                    this.drawLabel(d3.select(c[i]), d, "to")
+                }
             })
 
         this.labels = this.rootG.select("#label-container").selectAll(".label").selectAll("g")

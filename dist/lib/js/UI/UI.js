@@ -79,7 +79,7 @@ class UI {
   initializeDOM() {
     const width = this.graphContainerElement.offsetWidth;
     const height = this.graphContainerElement.offsetHeight;
-    const rootG = d3.select(this.graphContainerElement).insert("svg", "div").attr("class", "NYANG").classed("svgGraph", true).attr("width", width).attr("height", height).attr("viewBox", "0 0 " + width + " " + height).on("click", () => {
+    const rootG = d3.select(this.graphContainerElement).insert("svg", "*").attr("class", "NYANG").classed("svgGraph", true).attr("width", width).attr("height", height).attr("viewBox", "0 0 " + width + " " + height).on("click", () => {
       //Do not bubble the event
       d3.event.stopPropagation();
       this.ee.trigger(_EventEnum.default.CLICK_ENTITY, null);
@@ -101,7 +101,7 @@ class UI {
     this.rootG.select("#multiplicity-container").selectAll(".multiplicity").remove();
     this.rootG.select("#node-container").selectAll(".node").remove();
     this.rootG.select("#label-container").selectAll(".label").remove();
-    this.graphContainerElement.remove();
+    d3.select(this.graphContainerElement).select("svg").remove();
     d3.select("#".concat(this.stylesID)).remove();
   }
 

@@ -8,6 +8,7 @@ export default class ZoomHandler {
         this.enableZoomButtons = options.enableZoomButtons !== undefined ? options.enableZoomButtons : Env.ENABLE_ZOOM_BUTTONS
         this.ee = eventEmitter
         this.ee.on(EventEnum.ZOOM_REQUESTED, (x, y, scale) => { this.handleZoomRequest(x, y, scale) })
+        this.ee.on(EventEnum.GRAPH_WILL_UNMOUNT, () => this.destroy())
         this.zoom = d3.zoom()
             .scaleExtent(Env.SCALE_EXTENT)
             .on("zoom", () => {
@@ -17,13 +18,17 @@ export default class ZoomHandler {
         if (this.enableZoomButtons) {
             this.initializeZoomButtons()
         }
+        else {
+            this.zoomButtonContainer = null
+        }
     }
 
     initializeZoomButtons() {
-        const zoomButtons = d3.select(this.graphContainerElement)
+        this.zoomButtonContainer = d3.select(this.graphContainerElement)
             .append("div")
             .attr("style", "position:relative;")
-            .append("svg")
+
+        const zoomButtons = this.zoomButtonContainer.append("svg")
             .attr("style", "position:absolute;height:60px;width:30px;right:15px;bottom:15px;")
             .append("g")
             .attr("class", "NYANG-zoom-controls")
@@ -133,6 +138,12 @@ export default class ZoomHandler {
         }
         else {
             this.resetZoom()
+        }
+    }
+
+    destroy() {
+        if (this.zoomButtonContainer) {
+            this.zoomButtonContainer.remove()
         }
     }
 }

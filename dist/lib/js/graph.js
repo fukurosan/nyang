@@ -29,7 +29,7 @@ class ModelGraph {
   constructor(graphContainerElement, inputData, options) {
     /* Init user input */
     this.options = Object.assign.apply(Object, [{}].concat(options));
-    this.style = JSON.parse(JSON.stringify(inputData.style));
+    this.style = inputData.style ? JSON.parse(JSON.stringify(inputData.style)) : {};
     /* Init EventEmitter */
 
     this.ee = new _EventEmitter.default(); //If the user specified listeners in options then add them
@@ -171,7 +171,6 @@ class ModelGraph {
   destroyGraph() {
     //All unmount listeners must be synchronous!!
     this.ee.trigger(_EventEnum.default.GRAPH_WILL_UNMOUNT);
-    this.UI.graphContainerElement.remove();
     Object.keys(this).forEach(key => {
       delete this[key];
     });
