@@ -452,7 +452,7 @@ class DOMProcessor {
       this.ee.trigger(_EventEnum.default.DBL_CLICK_ENTITY, {
         id: d.id,
         data: d.data,
-        direction: from
+        direction: "from"
       });
     }).on("contextmenu", d => {
       d3.event.preventDefault();
@@ -474,7 +474,7 @@ class DOMProcessor {
       this.ee.trigger(_EventEnum.default.DBL_CLICK_ENTITY, {
         id: d.id,
         data: d.data,
-        direction: from
+        direction: "from"
       });
     }).on("contextmenu", d => {
       d3.event.preventDefault();

@@ -134,6 +134,23 @@
             box-sizing: border-box;
             margin-bottom: 0.5em;
         }
+
+        #close-button {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+            cursor: pointer;
+            stroke: white;
+            width: 30px;
+            height: 30px;
+            display: none;
+        }
+
+        @media screen and (max-width: 500px) {
+            #close-button {
+                display: block;
+            }
+        }
     </style>
 </head>
 
@@ -150,6 +167,10 @@
             </div>
             <div class="sidebar-area">
                 <div class="sidebar-inner-area">
+                    <svg id="close-button" onclick="toggleControlPanel()">
+                        <line x1="1" y1="25" x2="25" y2="1" stroke-width="4" />
+                        <line x1="1" y1="1" x2="25" y2="25" stroke-width="4" />
+                    </svg>
                     <div class="control-panel-button" onclick="toggleControlPanel()">
                         <p>Control Panel</p>
                     </div>

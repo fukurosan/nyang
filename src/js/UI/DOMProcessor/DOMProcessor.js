@@ -530,7 +530,7 @@ export default class DOMProcessor {
                 this.ee.trigger(EventEnum.DBL_CLICK_ENTITY, {
                     id: d.id,
                     data: d.data,
-                    direction: from
+                    direction: "from"
                 })
             })
             .on("contextmenu", (d) => {
@@ -556,7 +556,7 @@ export default class DOMProcessor {
                 this.ee.trigger(EventEnum.DBL_CLICK_ENTITY, {
                     id: d.id,
                     data: d.data,
-                    direction: from
+                    direction: "from"
                 })
             })
             .on("contextmenu", (d) => {

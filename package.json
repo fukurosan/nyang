@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Not your average network graph",
   "private": false,
-  "main": "./dist/lib/index.js",
+  "main": "./dist/bundle.js",
   "scripts": {
     "build": "npm run build:wbp & npm run build:lib",
     "build:wbp": "webpack --config webpack.config.js",
