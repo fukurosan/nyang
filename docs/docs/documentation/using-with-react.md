@@ -1,12 +1,12 @@
 # React
-Nyang can of course be easily implemented in any React project.
+NYANG can of course be easily implemented in any React project.
 
 Here is a simple example for reference:
 ```jsx
 import React from "react"
 import NYANG from "nyang"
 
-export default class NyangGraph extends React.Component {
+export default class NYANGGraph extends React.Component {
 
     constructor(props) {
         //For this example the props will contain an object called "data". This contains a correctly formatted nyang graph dataset, and cannot be null.

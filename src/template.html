@@ -248,7 +248,7 @@
                             console.log("Double clicked:", item)
                         },
                         rotateLabels: true,
-                        enableGrid: true,
+                        enableSecondaryGrid: true,
                         enableMultiLineNodeLabels: true,
                         enableFixedEdgeLabelWidth: true,
                         maxEdgeLabelWidth: 130,
@@ -304,7 +304,7 @@
                     window.graph = new NYANG(graphContainer, data, options)
                 }
             }
-            xhttp.open("GET", "./data/FOAF.json", true)
+            xhttp.open("GET", "./data/model.json", true)
             xhttp.send()
         }
 
@@ -373,9 +373,8 @@
                 window.graph.centerNode(value)
             }
         }
-
-
     </script>
+    <script src="./nyang.js"></script>
 </body>
 
 </html>

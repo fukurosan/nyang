@@ -2,148 +2,293 @@ import * as d3 from "d3"
 import Env from "../../Config/Env"
 import EventEnum from "../../Events/EventEnum"
 
+/**
+ * The zoom handler class handles anything and everything related to zooming.
+ */
 export default class ZoomHandler {
-    constructor(graphContainerElement, eventEmitter, options) {
-        this.graphContainerElement = graphContainerElement
-        this.enableZoomButtons = options.enableZoomButtons !== undefined ? options.enableZoomButtons : Env.ENABLE_ZOOM_BUTTONS
-        this.ee = eventEmitter
-        this.ee.on(EventEnum.ZOOM_REQUESTED, (x, y, scale) => { this.handleZoomRequest(x, y, scale) })
-        this.ee.on(EventEnum.GRAPH_WILL_UNMOUNT, () => this.destroy())
-        this.zoom = d3.zoom()
-            .scaleExtent(Env.SCALE_EXTENT)
-            .on("zoom", () => {
-                const rootG = d3.select(this.graphContainerElement).select("g")
-                rootG.attr("transform", d3.event.transform)
-            })
-        if (this.enableZoomButtons) {
-            this.initializeZoomButtons()
-        }
-        else {
-            this.zoomButtonContainer = null
-        }
-    }
+	constructor(graphContainerElement, eventEmitter, options) {
+		this.graphContainerElement = graphContainerElement
+		this.enableZoomButtons = options.enableZoomButtons !== undefined ? options.enableZoomButtons : Env.ENABLE_ZOOM_BUTTONS
+		this.ee = eventEmitter
+		this.ee.on(EventEnum.ZOOM_REQUESTED, (x, y, scale) => {
+			this.handleZoomRequest(x, y, scale)
+		})
+		this.ee.on(EventEnum.GRAPH_WILL_UNMOUNT, () => this.destroy())
+		this.zoom = d3
+			.zoom()
+			.scaleExtent(Env.SCALE_EXTENT)
+			.on("zoom", () => {
+				const rootG = d3.select(this.graphContainerElement).select("g")
+				rootG.attr("transform", d3.event.transform)
+			})
+		if (this.enableZoomButtons) {
+			this.initializeZoomButtons()
+		} else {
+			this.zoomButtonContainer = null
+		}
+	}
 
-    initializeZoomButtons() {
-        this.zoomButtonContainer = d3.select(this.graphContainerElement)
-            .append("div")
-            .attr("style", "position:relative;")
+	/**
+	 * Initializes the zoom controls in the bottom right corner.
+	 */
+	initializeZoomButtons() {
+		this.zoomButtonContainer = d3.select(this.graphContainerElement).append("div").attr("style", "position:relative;")
+		const zoomButtons = this.zoomButtonContainer
+			.append("svg")
+			.attr("filter", "drop-shadow(0px 0px 2px rgba(0, 0, 0, .5))")
+			.attr("style", "position:absolute;height:110px;width:34px;right:15px;bottom:30px;")
+			.append("g")
+			.attr("class", "nyang-zoom-controls")
+			.attr("style", "cursor:pointer;")
 
-        const zoomButtons = this.zoomButtonContainer.append("svg")
-            .attr("style", "position:absolute;height:60px;width:30px;right:15px;bottom:15px;")
-            .append("g")
-            .attr("class", "NYANG-zoom-controls")
-            .attr("style", "cursor:pointer;")
+		zoomButtons
+			.append("g")
+			.on("click", () => {
+				this.scaleBy(1.5)
+			})
+			.attr("class", "nyang-zoom-in")
+			.attr("transform", "translate(0, 0)")
+			.append("defs")
+			.append("path")
+			.attr("id", "prefix__zoomin_a")
+			.attr(
+				"d",
+				"M12.5 11h-.79l-.28-.27C12.41 9.59 13 8.11 13 6.5 13 2.91 10.09 0 6.5 0S0 2.91 0 6.5 2.91 13 6.5 13c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L17.49 16l-4.99-5zm-6-9C8.99 2 11 4.01 11 6.5S8.99 11 6.5 11 2 8.99 2 6.5 4.01 2 6.5 2zM7 4H6v2H4v1h2v2h1V7h2V6H7V4z"
+			)
+			.select(function () {
+				return this.parentNode
+			})
+			.select(function () {
+				return this.parentNode
+			})
+			.append("rect")
+			.attr("x", "2")
+			.attr("y", "2")
+			.attr("rx", "5")
+			.attr("ry", "5")
+			.attr("width", "30")
+			.attr("height", "30")
+			.attr("fill", "white")
+			.select(function () {
+				return this.parentNode
+			})
 
-        zoomButtons
-            .append("g")
-            .on('click', () => {
-                this.scaleBy(1.5);
-            })
-            .attr("class", "NYANG-zoom-in")
-            .attr("transform", "translate(0, 0)")
-            .append("rect")
-            .attr("style", "fill: white;stroke: #596877;stroke-width:1;")
-            .attr("width", "30")
-            .attr("height", "30")
-            .select(function () {
-                return this.parentNode;
-            })
-            .append("line")
-            .attr("style", "stroke: #596877;stroke-width: 2;")
-            .attr("x1", "5")
-            .attr("y1", "15")
-            .attr("x2", "25")
-            .attr("y2", "15")
-            .select(function () {
-                return this.parentNode;
-            })
-            .append("line")
-            .attr("style", "stroke: #596877;stroke-width: 2;")
-            .attr("x1", "15")
-            .attr("y1", "5")
-            .attr("x2", "15")
-            .attr("y2", "25")
+			.append("g")
+			.attr("fill", "none")
+			.attr("fill-rule", "evenodd")
+			.attr("transform", "translate(9 9)")
+			.append("mask")
+			.attr("id", "prefix__zoomin_b")
+			.attr("fill", "#fff")
+			.append("use")
+			.attr("xedge:href", "#prefix__zoomin_a")
+			.select(function () {
+				return this.parentNode
+			})
+			.select(function () {
+				return this.parentNode
+			})
+			.append("g")
+			.attr("fill", "#666")
+			.attr("mask", "url(#prefix__zoomin_b)")
+			.append("path")
+			.attr("d", "M0 0H50V50H0z")
+			.attr("transform", "translate(-16 -16)")
 
-        zoomButtons
-            .append("g")
-            .on('click', () => {
-                this.scaleBy(1 / 1.5);
-            })
-            .attr("class", "NYANG-zoom-out")
-            .attr("transform", "translate(0, 30)")
-            .append("rect")
-            .attr("style", "fill: white;stroke: #596877;stroke-width: 1;")
-            .attr("width", "30")
-            .attr("height", "30")
-            .select(function () {
-                return this.parentNode;
-            })
-            .append("line")
-            .attr("style", "stroke: #596877;stroke-width: 2;")
-            .attr("x1", "5")
-            .attr("y1", "15")
-            .attr("x2", "25")
-            .attr("y2", "15")
-    }
+		zoomButtons
+			.append("g")
+			.on("click", () => {
+				this.scaleBy(1 / 1.5)
+			})
+			.attr("class", "nyang-zoom-out")
+			.attr("transform", "translate(0, 38)")
+			.append("defs")
+			.append("path")
+			.attr("id", "prefix__zoomout_a")
+			.attr(
+				"d",
+				"M12.5 11h-.79l-.28-.27C12.41 9.59 13 8.11 13 6.5 13 2.91 10.09 0 6.5 0S0 2.91 0 6.5 2.91 13 6.5 13c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L17.49 16l-4.99-5zm-6 0C4.01 11 2 8.99 2 6.5S4.01 2 6.5 2 11 4.01 11 6.5 8.99 11 6.5 11zM4 6h5v1H4V6z"
+			)
+			.select(function () {
+				return this.parentNode
+			})
+			.select(function () {
+				return this.parentNode
+			})
 
-    scaleTo(scale) {
-        this.zoom.scaleTo(d3.select(this.graphContainerElement).select("svg"), scale)
-    }
+			.append("rect")
+			.attr("x", "2")
+			.attr("y", "2")
+			.attr("rx", "5")
+			.attr("ry", "5")
+			.attr("width", "30")
+			.attr("height", "30")
+			.attr("fill", "white")
+			.select(function () {
+				return this.parentNode
+			})
+			.append("g")
+			.attr("fill", "none")
+			.attr("fill-rule", "evenodd")
+			.attr("transform", "translate(9 9)")
+			.append("mask")
+			.attr("id", "prefix__zoomout_b")
+			.attr("fill", "#fff")
+			.append("use")
+			.attr("xedge:href", "#prefix__zoomout_a")
+			.select(function () {
+				return this.parentNode
+			})
+			.select(function () {
+				return this.parentNode
+			})
+			.append("g")
+			.attr("fill", "#666")
+			.attr("mask", "url(#prefix__zoomout_b)")
+			.append("path")
+			.attr("d", "M0 0H50V50H0z")
+			.attr("transform", "translate(-16 -16)")
 
-    scaleBy(ratio) {
-        this.zoom.scaleBy(d3.select(this.graphContainerElement).select("svg").transition().duration(Env.ZOOM_TIME / 2), ratio);
-    }
+		zoomButtons
+			.append("g")
+			.on("click", () => {
+				this.resetZoom()
+			})
+			.attr("class", "nyang-zoom-reset")
+			.attr("transform", "translate(0, 76)")
+			.append("defs")
+			.append("path")
+			.attr("id", "prefix__reset_a")
+			.attr(
+				"d",
+				"M15 10c.552 0 1 .448 1 1v5h-5c-.552 0-1-.448-1-1s.448-1 1-1h3v-3c0-.552.448-1 1-1zM1 10c.552 0 1 .448 1 1v3h3c.552 0 1 .448 1 1s-.448 1-1 1H0v-5c0-.552.448-1 1-1zM16 0v5c0 .552-.448 1-1 1s-1-.448-1-1V2h-3c-.552 0-1-.448-1-1s.448-1 1-1h5zM5 0c.552 0 1 .448 1 1s-.448 1-1 1H2v3c0 .552-.448 1-1 1s-1-.448-1-1V0z"
+			)
+			.select(function () {
+				return this.parentNode
+			})
+			.select(function () {
+				return this.parentNode
+			})
 
-    /* This function resets the zoom to the initial position */
-    resetZoom() {
-        //TODO: This is broken. If the SVG changes shape this will fail to center the group correctly.
-        //It works so-so, though. The group will at the very least have the correct scale.
-        const rootG = d3.select(this.graphContainerElement).select("g")
-        const currentTransformStr = rootG.attr("transform")
-        let currentScale = currentTransformStr.substring(currentTransformStr.indexOf("scale(") + 6, currentTransformStr.lastIndexOf(")"))
-        currentScale = parseFloat(currentScale)
+			.append("rect")
+			.attr("x", "2")
+			.attr("y", "2")
+			.attr("rx", "5")
+			.attr("ry", "5")
+			.attr("width", "30")
+			.attr("height", "30")
+			.attr("fill", "white")
+			.select(function () {
+				return this.parentNode
+			})
+			.append("g")
+			.attr("fill", "none")
+			.attr("fill-rule", "evenodd")
+			.attr("transform", "translate(9 9)")
+			.append("mask")
+			.attr("id", "prefix__reset_b")
+			.attr("fill", "#fff")
+			.append("use")
+			.attr("xedge:href", "#prefix__reset_a")
+			.select(function () {
+				return this.parentNode
+			})
+			.select(function () {
+				return this.parentNode
+			})
+			.append("g")
+			.attr("fill", "#666")
+			.attr("mask", "url(#prefix__reset_b)")
+			.append("path")
+			.attr("d", "M0 0H50V50H0z")
+			.attr("transform", "translate(-16 -16)")
+	}
 
-        const width = this.graphContainerElement.offsetWidth
-        const height = this.graphContainerElement.offsetHeight
+	/**
+	 * Set the zoom scale to a given number.
+	 * @param {number} scale - New scale
+	 */
+	scaleTo(scale) {
+		this.zoom.scaleTo(d3.select(this.graphContainerElement).select("svg"), scale)
+	}
 
-        const groupWidth = rootG.node().getBBox().width * currentScale
-        const groupHeight = rootG.node().getBBox().height * currentScale
-        const widthRatio = width / groupWidth
-        const heightRatio = height / groupHeight
-        const ratio = Math.min(widthRatio, heightRatio)
+	/**
+	 * Scale the zoom by a given amount.
+	 * @param {number} ratio - Amount to scale by
+	 */
+	scaleBy(ratio) {
+		this.zoom.scaleBy(
+			d3
+				.select(this.graphContainerElement)
+				.select("svg")
+				.transition()
+				.duration(Env.ZOOM_TIME / 2),
+			ratio
+		)
+	}
 
-        d3.select(this.graphContainerElement)
-            .select("svg")
-            .transition()
-            .duration(Env.ZOOM_TIME / 2)
-            .call(this.zoom.scaleBy, ratio)
-            .transition()
-            .call(this.zoom.translateTo, width / 2, height / 2)
-    }
+	/**
+	 * Reset the zoom (Zoom to fit).
+	 */
+	resetZoom() {
+		const rootG = d3.select(this.graphContainerElement).select("g")
+		const currentTransformStr = rootG.attr("transform")
+		let currentScale = currentTransformStr.substring(currentTransformStr.indexOf("scale(") + 6, currentTransformStr.lastIndexOf(")"))
+		currentScale = parseFloat(currentScale)
+		const parentWidth = this.graphContainerElement.clientWidth
+		const parentHeight = this.graphContainerElement.clientHeight
+		const width = (rootG.node().getBBox().width + Env.ZOOM_PADDING * 2) * currentScale
+		const height = (rootG.node().getBBox().height + Env.ZOOM_PADDING * 2) * currentScale
+		const widthRatio = parentWidth / width
+		const heightRatio = parentHeight / height
+		const newScale = Math.min(widthRatio, heightRatio)
+		const midX = rootG.node().getBBox().x + rootG.node().getBBox().width / 2
+		const midY = rootG.node().getBBox().y + rootG.node().getBBox().height / 2
+		d3.select(this.graphContainerElement)
+			.select("svg")
+			.transition()
+			.duration(Env.ZOOM_TIME / 4)
+			.call(this.zoom.scaleBy, newScale)
+			.transition()
+			.call(this.zoom.translateTo, midX, midY)
+	}
 
-    /* This function transforms the svg>g element to a specific translation and scale */
-    zoomToCoordinates(x, y, scale) {
-        d3.select(this.graphContainerElement)
-            .select("svg")
-            .transition()
-            .duration(Env.ZOOM_TIME)
-            .call(this.zoom.transform, d3.zoomIdentity.translate(x, y).scale(scale))
-            .select("g")
-            .attr("transform", `translate(${x},${y})scale(${scale})`)
-    }
+	/**
+	 * Transforms the svg>g element to a specific translation and scale.
+	 * @param {number} x - New X coordinate
+	 * @param {number} y - New Y coordinate
+	 * @param {number} scale - New scale
+	 */
+	zoomToCoordinates(x, y, scale) {
+		d3.select(this.graphContainerElement)
+			.select("svg")
+			.transition()
+			.duration(Env.ZOOM_TIME)
+			.call(this.zoom.transform, d3.zoomIdentity.translate(x, y).scale(scale))
+			.select("g")
+			.attr("transform", `translate(${x},${y})scale(${scale})`)
+	}
 
-    handleZoomRequest(x, y, scale) {
-        if ((x || x === 0) && (y || y === 0) && scale) {
-            this.zoomToCoordinates(x, y, scale)
-        }
-        else {
-            this.resetZoom()
-        }
-    }
+	/**
+	 * Handle an incoming zoom request.
+	 * @param {number?} x - New X coordinate
+	 * @param {number?} y - New Y coordinate
+	 * @param {number?} scale - New scale
+	 */
+	handleZoomRequest(x, y, scale) {
+		if ((x || x === 0) && (y || y === 0) && scale) {
+			this.zoomToCoordinates(x, y, scale)
+		} else {
+			this.resetZoom()
+		}
+	}
 
-    destroy() {
-        if (this.zoomButtonContainer) {
-            this.zoomButtonContainer.remove()
-        }
-    }
+	/**
+	 * Completely remove the zoom utility from the DOM.
+	 */
+	destroy() {
+		if (this.zoomButtonContainer) {
+			this.zoomButtonContainer.remove()
+		}
+	}
 }

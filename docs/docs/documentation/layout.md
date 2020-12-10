@@ -1,5 +1,5 @@
 # Layout
-Nyang supports different graph layouts that can be set using the nyang API. 
+NYANG supports different graph layouts that can be set using the nyang API. 
 
 ## Matrix Layout
 Matrix layouts are a way of grouping data in clusters. To create a matrix layout you need to supply information to nyang about what group each node is a part of, as well as (potentially) what order these should be displayed in. 

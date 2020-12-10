@@ -1,5 +1,5 @@
 # Zoom
-Nyang can be instructed to either zoom in on a specific node, or zoom out and center the graph. In order to zoom in on a specific node you need to supply a node id to the zoomToNode function.
+NYANG can be instructed to either zoom in on a specific node, or zoom out and center the graph. In order to zoom in on a specific node you need to supply a node id to the zoomToNode function.
 
 Consider the following example:
 ```javascript

@@ -1,5 +1,5 @@
 # Highlight Search
-Nyang allows you to supply a search query to your graph, and will highlight any nodes that match the provided search criteria. 
+NYANG allows you to supply a search query to your graph, and will highlight any nodes that match the provided search criteria. 
 
 You can either supply an attribute and value combination, or a custom function to determine what to match (attribute/value combination will be applied as ".startsWith(value)"). The custom function should take the bound data object on the nodes as an input argument and return true if it is a match, otherwise false. 
 

@@ -1,5 +1,5 @@
 # Hover Effects
-Nyang supports different visual hover effects.
+NYANG supports different visual hover effects.
 
 ## Fade on hover
 Fade on hover instructs nyang to fade the opacity of non-connected nodes and edges when a node is hovered. This allows you to create a clear graphical focus on not just the individual node that the user is hovering, but everything in its connected vicinity.

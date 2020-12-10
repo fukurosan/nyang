@@ -1,5 +1,5 @@
 # Context Menu (Right click menu)
-Nyang has a custom context menu that can be enabled/disabled as needed using the boolean option enableContextMenu. You can also add your own custom menu items to the context menu by passing them into the customContextMenuAddons option. 
+NYANG has a custom context menu that can be enabled/disabled as needed using the boolean option enableContextMenu. You can also add your own custom menu items to the context menu by passing them into the customContextMenuAddons option. 
 
 There are three types of context menus:
 - `node` (on node right click)

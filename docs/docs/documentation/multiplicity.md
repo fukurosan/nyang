@@ -1,5 +1,5 @@
 # Multiplicity
-Nyang is able to display multiplicity on relations. This can be specified by supplying a multiplicityFrom and multiplicityTo attribute on the edge objects in your dataset.
+NYANG is able to display multiplicity on relations. This can be specified by supplying a multiplicityFrom and multiplicityTo attribute on the edge objects in your dataset.
 
 Consider the following example:
 ```javascript

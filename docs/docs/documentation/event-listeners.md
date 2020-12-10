@@ -1,5 +1,5 @@
 # Event Listeners
-Nyang is event driven, and exposes a few events to developers. You can listen for these events by providing a custom listener callback function in the options object provided to the NYANG constructor. To read more about the different events please check out the API reference page. 
+NYANG is event driven, and exposes a few events to developers. You can listen for these events by providing a custom listener callback function in the options object provided to the NYANG constructor. To read more about the different events please check out the API reference page. 
 
 Example of typical use:
 ```javascript

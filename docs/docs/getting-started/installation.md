@@ -11,6 +11,6 @@ import NYANG from "nyang"
 
 ## unpkg cdn
 ```html
-<script src="https://unpkg.com/nyang/dist/bundle.js"></script>
+<script src="https://unpkg.com/nyang"></script>
 ```
 

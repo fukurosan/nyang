@@ -1,22 +1,20 @@
 import Env from "../Config/Env.js"
 
-/* This function writes user defined CSS classes to the DOM dynamically on start */
+/**
+ * Writes user defined styles as CSS classes to the DOM dynamically.
+ * @param {object} style - User provided styles parameters
+ * @param {string} id - ID of the UI-class of this NYANG instance
+ */
 const initializeGraphStyles = (style, id) => {
-    let cssString = ""
-    cssString = `
-                /* This is a rule for all paths unless specified otherwise */
-                .NYANG path {
-                    stroke: #000000;
-                    stroke-width: 2px;
-                }
-                
+	let cssString = ""
+	cssString = `
                 /* Text */
-                .NYANG .multiplicity {
+                .nyang .multiplicity {
                     font-size: ${Env.DEFAULT_MULTIPLICITY_FONT_SIZE};
                 }     
 
                 /* Tooltip */
-                #NYANG-tooltip {
+                #nyang-tooltip {
                   position: absolute;
                   display: none;
                   min-width: ${Env.TOOLTIP_MIN_WIDTH};
@@ -32,49 +30,61 @@ const initializeGraphStyles = (style, id) => {
                 }
 
                 /* Context Menu Styles */
-                .NYANG-context-menu {
-                    box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);
-                    position: relative;
-                    display: block;
-                    background: #FFFFFF;
-                  }
-                  .NYANG-context-menu-options {
-                    min-width: 150px;
-                    list-style: none;
-                    padding: 0px;
-                    margin-top: 10px;
-                    margin-bottom: 10px;
-                  }
-                  .NYANG-context-menu-option {
-                    font-size: 14px;
-                    padding: 7px 20px 7px 20px;
-                    cursor: pointer;
-                  }
-                  .NYANG-context-menu-divider {
-                    width: 90%;
-                    height: 1px;
-                    margin-right: 5%;
-                    margin-left: 5%;
-                    margin-top: 8px;
-                    margin-bottom: 8px;
-                    background: #d5d5d5;
-                  }
-                  .NYANG-context-menu-option:hover {
-                    background: rgba(0, 0, 0, 0.2);
-                  }
-                  .NYANG-node-edge-counter-badge {
-                    fill: coral;
-                    rx: 4px;
-                    ry: 4px;
-                  }
-                  .NYANG-node-edge-counter-badge-text {
-                    dominant-baseline: central;
-                    text-anchor: middle;
-                    fill: white;
-                  }
-
+                /* This is a rule for all paths unless specified otherwise */
+                .nyang path {
+                  stroke: #000;
+                  stroke-width: 2px;
+                }
+                
+                .nyang-context-menu {
+                  box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);
+                  position: relative;
+                  display: block;
+                  background: #FFFFFF;
+                }
+                
+                .nyang-context-menu-options {
+                  min-width: 150px;
+                  list-style: none;
+                  padding: 0px;
+                  margin-top: 10px;
+                  margin-bottom: 10px;
+                }
+                
+                .nyang-context-menu-option {
+                  font-size: 14px;
+                  padding: 7px 20px 7px 20px;
+                  cursor: pointer;
+                }
+                
+                .nyang-context-menu-divider {
+                  width: 90%;
+                  height: 1px;
+                  margin-right: 5%;
+                  margin-left: 5%;
+                  margin-top: 8px;
+                  margin-bottom: 8px;
+                  background: #d5d5d5;
+                }
+                
+                .nyang-context-menu-option:hover {
+                  background: rgba(0, 0, 0, 0.2);
+                }
+                
+                .nyang-node-edge-counter-badge {
+                  fill: coral;
+                  rx: 4px;
+                  ry: 4px;
+                }
+                
+                .nyang-node-edge-counter-badge-text {
+                  dominant-baseline: central;
+                  text-anchor: middle;
+                  fill: white;
+                }
+                
                 /* Search Highlighting */
-                .NYANG .highlighted-node {
+                .nyang .highlighted-node {
                   stroke-width: ${Env.HIGHLIGHTING_BORDER_WIDTH};
                   stroke: ${Env.HIGHLIGHTING_BORDER_COLOR};
                   fill: ${Env.HIGHLIGHTING_COLOR};
@@ -161,15 +171,15 @@ const initializeGraphStyles = (style, id) => {
                 .node:hover .node-text-default {
                     fill: ${Env.DEFAULT_NODE_TEXT_HOVER_COLOR};
                 }
-                .NYANG .node-default.focused {
+                .nyang .node-default.focused {
                     stroke: ${Env.DEFAULT_FOCUS_COLOR} !important;
                     stroke-width: ${Env.DEFAULT_NODE_FOCUSED_BORDER_WIDTH} !important;
                 }
                 `
 
-    if (style && style.nodes) {
-        style.nodes.forEach(nodeType => {
-            cssString = `
+	if (style && style.nodes) {
+		style.nodes.forEach(nodeType => {
+			cssString = `
                 ${cssString}
                 .node-${nodeType.id} {
                     cursor: pointer;
@@ -179,7 +189,9 @@ const initializeGraphStyles = (style, id) => {
                     stroke-dasharray: ${nodeType.dotted ? Env.DEFAULT_NODE_DOTTED_DASHARRAY : 0};
                     rx: ${nodeType.borderRadiusX ? nodeType.borderRadiusX : Env.DEFAULT_NODE_BORDER_RADIUS_X};
                     ry: ${nodeType.borderRadiusY ? nodeType.borderRadiusY : Env.DEFAULT_NODE_BORDER_RADIUS_Y};
-                    filter: ${nodeType.shadow ? `drop-shadow(${nodeType.shadow})` : Env.DEFAULT_NODE_SHADOW ? `drop-shadow(${Env.DEFAULT_NODE_SHADOW})` : "none"};
+                    filter: ${
+	nodeType.shadow ? `drop-shadow(${nodeType.shadow})` : Env.DEFAULT_NODE_SHADOW ? `drop-shadow(${Env.DEFAULT_NODE_SHADOW})` : "none"
+};
                 }
                 .node-${nodeType.id}:hover {
                     fill: ${nodeType.hoverColor ? nodeType.hoverColor : Env.DEFAULT_NODE_HOVER_COLOR};
@@ -194,17 +206,17 @@ const initializeGraphStyles = (style, id) => {
                 .node:hover .node-text-${nodeType.id} {
                     fill: ${nodeType.textHoverColor ? nodeType.textHoverColor : Env.DEFAULT_NODE_TEXT_HOVER_COLOR};
                 }
-                .NYANG .node-${nodeType.id}.focused {
+                .nyang .node-${nodeType.id}.focused {
                     stroke: ${nodeType.focusedColor ? nodeType.focusedColor : Env.DEFAULT_FOCUS_COLOR} !important;
                     stroke-width: ${nodeType.focusedBorderWidth ? nodeType.focusedBorderWidth : Env.DEFAULT_NODE_FOCUSED_BORDER_WIDTH} !important;
                 }
                 `
-        })
-    }
+		})
+	}
 
-    if (style && style.edges) {
-        style.edges.forEach(edgeType => {
-            cssString = `
+	if (style && style.edges) {
+		style.edges.forEach(edgeType => {
+			cssString = `
                 ${cssString}
                 .edge-path-${edgeType.id}{
                     fill: none !important;
@@ -258,16 +270,16 @@ const initializeGraphStyles = (style, id) => {
                     stroke: ${edgeType.focusedColor ? edgeType.focusedColor : Env.DEFAULT_FOCUS_COLOR} !important;
                 }
                 `
-        })
-    }
+		})
+	}
 
-    const css = document.createElement('style')
-    css.type = 'text/css'
-    css.id = id
-    css.appendChild(document.createTextNode(cssString))
-    document.getElementsByTagName("head")[0].appendChild(css)
+	const css = document.createElement("style")
+	css.type = "text/css"
+	css.id = id
+	css.appendChild(document.createTextNode(cssString))
+	document.getElementsByTagName("head")[0].appendChild(css)
 }
 
 export default {
-    initializeGraphStyles: initializeGraphStyles,
+	initializeGraphStyles
 }
