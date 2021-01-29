@@ -192,7 +192,9 @@
                         <h2>Highlight Search</h2>
                         <input type="text" id="search-input" class="text-input"
                             placeholder="Highlight... (try 'person')" />
-                        <button class="nyang-button" onclick="highlight()">Search</button>
+                        <button class="nyang-button" style="margin-bottom:0.5em;" onclick="highlight()">Search</button>
+                        <button class="nyang-button" style="margin-bottom:0.5em;" onclick="disable()">Disable</button>
+                        <button class="nyang-button" onclick="clearDisable()">Clear Disable</button>
                     </div>
                     <hr />
                     <div>
@@ -328,6 +330,17 @@
             if (value && value.length >= 3) {
                 window.graph.highlight("name", value)
             }
+        }
+
+        function disable() {
+            const value = document.getElementById("search-input").value
+            if (value && value.length >= 3) {
+                window.graph.disable("name", value)
+            }
+        }
+
+        function clearDisable() {
+            window.graph.clearDisable()
         }
 
         function zoomToNode() {

@@ -1,6 +1,6 @@
 # Installation
 
-First you need to install virrvarr in your project.
+First you need to install nyang in your project.
 ## npm
 ```bash
 npm install nyang

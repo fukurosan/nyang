@@ -8,7 +8,7 @@ import Env from "../../Config/Env"
 export default class ContextMenu {
 	constructor(graphContainerElement, eventEmitter, options) {
 		this.showContextMenu = options.enableContextMenu !== undefined ? options.enableContextMenu : Env.SHOW_CONTEXT_MENU
-		this.customContextMenu = options.customContextMenu !== undefined ? options.customContextMenu : Env.DEFAULT_CUSTOM_CONTEXT_MENU
+		this.customContextMenuAddons = options.customContextMenuAddons !== undefined ? options.customContextMenuAddons : Env.DEFAULT_CUSTOM_CONTEXT_MENU
 		this.graphContainerElement = graphContainerElement
 		this.ee = eventEmitter
 		if (this.showContextMenu) {
@@ -111,8 +111,8 @@ export default class ContextMenu {
 	createNodeContextMenu(clickedItem, mouseX, mouseY) {
 		const sections = [this.NodeMenu, this.UniversalMenu]
 		let customSections = []
-		if (this.customContextMenu.node) {
-			customSections = [...this.customContextMenu.node]
+		if (this.customContextMenuAddons.node) {
+			customSections = [...this.customContextMenuAddons.node]
 		}
 		this.createContextMenu(clickedItem, sections, customSections, mouseX, mouseY)
 	}
@@ -127,8 +127,8 @@ export default class ContextMenu {
 	createEdgeContextMenu(clickedItem, mouseX, mouseY, direction) {
 		const sections = [this.EdgeMenu, this.UniversalMenu]
 		let customSections = []
-		if (this.customContextMenu.edge) {
-			customSections = [...this.customContextMenu.edge]
+		if (this.customContextMenuAddons.edge) {
+			customSections = [...this.customContextMenuAddons.edge]
 		}
 
 		this.createContextMenu(clickedItem, sections, customSections, mouseX, mouseY, direction)
@@ -143,8 +143,8 @@ export default class ContextMenu {
 	createCanvasContextMenu(clickedItem, mouseX, mouseY) {
 		const sections = [this.UniversalMenu]
 		let customSections = []
-		if (this.customContextMenu.canvas) {
-			customSections = [...this.customContextMenu.canvas]
+		if (this.customContextMenuAddons.canvas) {
+			customSections = [...this.customContextMenuAddons.canvas]
 		}
 
 		this.createContextMenu(clickedItem, sections, customSections, mouseX, mouseY)
