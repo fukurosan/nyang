@@ -1,0 +1,36 @@
+export default EVENTS;
+/**
+ * All events in NYANG are stored here.
+ */
+declare const EVENTS: Readonly<{
+    CLICK_ENTITY: string;
+    DBL_CLICK_ENTITY: string;
+    HOVER_ENTITY: string;
+    RIGHT_CLICK_ENTITY: string;
+    NODE_DRAG_START: string;
+    NODE_DRAG_DRAGGED: string;
+    NODE_DRAG_ENDED: string;
+    MOUSE_OVER_NODE: string;
+    MOUSE_LEFT_NODE: string;
+    NODE_FIXATION_REQUESTED: string;
+    DATA_UPDATE_REQUESTED: string;
+    DATASTORE_UPDATED: string;
+    DOM_PROCESSOR_FINISHED: string;
+    ENGINE_UPDATE_FINISHED: string;
+    DATA_FILTER_REQUESTED: string;
+    DATA_FILTER_RESET_REQUESTED: string;
+    IMPLODE_EXPLODE_REQUESTED: string;
+    IMPLODE_EXPLODE_LEAFS_REQUESTED: string;
+    IMPLODE_EXPLODE_RECURSIVE_REQUESTED: string;
+    IMPLODE_EXPLODE_NON_CIRCULAR_REQUESTED: string;
+    ZOOM_REQUESTED: string;
+    HIGHLIGHT_NODE_REQUESTED: string;
+    DISABLE_NODES_REQUESTED: string;
+    CLEAR_DISABLE_NODES_REQUESTED: string;
+    TOGGLE_MULTIPLICITY_REQUESTED: string;
+    ENGINE_TICK: string;
+    ENGINE_LAYOUT_REQUESTED: string;
+    ENGINE_LAYOUT_RESET_REQUESTED: string;
+    GRAPH_HAS_MOUNTED: string;
+    GRAPH_WILL_UNMOUNT: string;
+}>;
