@@ -194,17 +194,59 @@ export class NYANG {
 	}
 
 	/**
-	 * Fixates a node to the center of the graph.
+	 * Pins a node to the center of the graph.
 	 * @param {string} nodeID - ID of the node to center
 	 * @return {void}
 	 */
 	centerNode(nodeID) {
 		const node = this._datastore.nodes.find(potentialNode => potentialNode.id === nodeID)
 		if (node) {
-			const width = this._UI.rootG.node().getBBox().width / 4
-			const height = this._UI.rootG.node().getBBox().height / 4
-			this._ee.trigger(EventEnum.NODE_FIXATION_REQUESTED, node, width, height)
+			const rootG = this._UI.rootG
+			const midX = rootG.node().getBBox().x + rootG.node().getBBox().width / 2
+			const midY = rootG.node().getBBox().y + rootG.node().getBBox().height / 2
+			node.targetX = midX
+			node.targetY = midY
+			node.sourceX = node.x
+			node.sourceY = node.y
+			this._datastore.entityProcessor.animateNodePositions([node]).then(() => {
+				this._datastore.entityProcessor.pinNode(node, midX, midY)
+				this._UI.DOMProcessor.updateNodes(this._UI.DOMProcessor.nodes)
+				this._engine.alpha(1)
+				this._engine.restart()
+			})
 		}
+	}
+
+	/**
+	 * Sets the pin mode for nodes on and off
+	 * Pin mode is when nodes are fixated upon drag
+	 * @param {boolean} isEnabled
+	 * @return {void}
+	 */
+	setPinMode(isEnabled) {
+		this._ee.trigger(EventEnum.NODE_PIN_MODE_TOGGLED, isEnabled)
+	}
+
+	/**
+	 * Pins the entire graph
+	 * @return {void}
+	 */
+	pinGraph() {
+		const pins = this._datastore.nodes.map(node => this._datastore.entityProcessor.pinNode(node, node.x, node.y))
+		Promise.all(pins).then(() => {
+			this._UI.DOMProcessor.updateNodes(this._UI.DOMProcessor.nodes)
+		})
+	}
+
+	/**
+	 * Resets all pins in the graph
+	 * @return {void}
+	 */
+	resetAllPins() {
+		this._datastore.allNodes.forEach(node => this._datastore.entityProcessor.unPinNode(node))
+		this._UI.DOMProcessor.updateNodes(this._UI.DOMProcessor.nodes)
+		this._engine.alpha(1)
+		this._engine.restart(1)
 	}
 
 	/**

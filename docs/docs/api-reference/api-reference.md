@@ -128,4 +128,8 @@ implodeOrExplodeNode   |   Function<(nodeID, isImplode)>   |   Implodes/Explodes
 implodeOrExplodeNodeLeafs   |   Function<(nodeID, isImplode)>   |   Implodes/Explodes nodes directly connected to the given node ID (in the TO direction), but only if the nodes do not branch out any further (i.e. have any TO connections). isImplode indicates if it is a implode or explode operation
 implodeOrExplodeNodeRecursive   |   Function<(nodeID, isImplode)>   |   Implodes/Explodes nodes directly connected to the given node ID (in the TO direction), and then recursively continues until it hits the end of the tree. isImplode indicates if it is a implode or explode operation
 implodeOrExplodeNodeNonCircular   |   Function<(nodeID, isImplode)>   |   Works very similarly to recursive, but only affects node paths that have no path back to the origin node.
+centerNode   |   Function<(nodeID)>   |   Centers a given node inside of the graph
+pinGraph   |   Function<()>   |   Pins (fixates) the entire graph.
+resetAllPins   |   Function<()>   |   Removes all pins.
+setPinMode   |   Function<(isEnabled)>   |   When enabled dragging nodes will cause them to be pinned (fixated) to the new position where they are dropped. Typically you may want to toggle this on and off if for example the user is holding down a key on their keyboard.
 destroyGraph   |   Function<()>   |   Completely removes the graph and all its components from the DOM, and deletes its content. This is necessary sometimes if working with frontend frameworks.

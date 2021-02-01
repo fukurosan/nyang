@@ -11,6 +11,7 @@ export default class DOMProcessor {
     nodes: any[];
     edges: any[];
     listeningForTick: boolean;
+    pinMode: boolean;
     ee: any;
     /**
      * Updates all markers (arrows for edges)
@@ -124,11 +125,17 @@ export default class DOMProcessor {
      */
     drawTextline(element: any, word: any, type: any, y: any): void;
     /**
-     * Draws a badge in the top right corner of nodes with a number of a hidden edge count in it.
+     * Draws a badge in the bottom right corner of nodes with a number of a hidden edge count in it.
      * @param {D3Selecton} element - Node element selection by D3
      * @param {Object} data - Node data
      */
     drawNodeCollapsedEdgeCounter(element: any, data: Object): void;
+    /**
+     * Draws a pin in the top right corner of a node.
+     * @param {D3Selecton} element - Node element selection by D3
+     * @param {Object} data - Node data
+     */
+    drawPin(element: any, data: Object): void;
     /**
      * Creates event listener for onClick events for nodes and edges
      */

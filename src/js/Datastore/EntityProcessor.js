@@ -1,4 +1,3 @@
-import EventEnum from "../Events/EventEnum"
 import Env from "../Config/Env"
 
 /**
@@ -16,9 +15,6 @@ export default class EntityProcessor {
 		this.maxEdgeLabelWidth = userDefinedOptions.maxEdgeLabelWidth ? userDefinedOptions.maxEdgeLabelWidth : Env.LABEL_WIDTH * 2
 
 		this.ee = eventEmitter
-		this.ee.on(EventEnum.NODE_FIXATION_REQUESTED, (node, x, y) => {
-			this.repositionNode(node, x, y)
-		})
 	}
 
 	/**
@@ -40,9 +36,32 @@ export default class EntityProcessor {
 	 * @param {number} x - X coordinate
 	 * @param {number} y - Y coordinate
 	 */
-	repositionNode(node, x, y) {
+	pinNode(node, x, y) {
 		node.fx = x
 		node.fy = y
+	}
+
+	/**
+	 * Repositions a node to given coordinates.
+	 * @param {object} node - Node object to be moved
+	 * @param {number} newX - Target X coordinate
+	 * @param {number} newY - Target Y coordinate
+	 */
+	repositionNode(node, newX, newY) {
+		node.sourceX = node.x
+		node.sourceY = node.y
+		node.targetX = newX
+		node.targetY = newY
+		return this.animateNodePositions([node])
+	}
+
+	/**
+	 * Removes fixation of a node in the graph.
+	 * @param {object} node - Node object to be unpinned
+	 */
+	unPinNode(node) {
+		node.fx = null
+		node.fy = null
 	}
 
 	/**
@@ -228,6 +247,7 @@ export default class EntityProcessor {
 							node.fy = node.originalFy
 							delete node.originalFy
 						}
+						delete node.animating
 					})
 					resolve()
 				} else {
@@ -246,6 +266,7 @@ export default class EntityProcessor {
 				node.originalFy = node.fy
 				node.fx = node.x
 				node.fy = node.y
+				node.animating = true
 			})
 			tween(Date.now(), Env.IMPLOSION_EXPLOSION_ANIMATION_TIME)
 		})

@@ -68,7 +68,7 @@
         }
 
         .control-panel-button {
-            margin-right: 95%;
+            margin-right: 96.6%;
             top: 40%;
             width: 130px;
             height: 55px;
@@ -216,10 +216,13 @@
                     </div>
                     <hr />
                     <div>
-                        <h2>Center Node</h2>
+                        <h2>Pinning</h2>
                         <input type="text" id="center-nodeid" class="text-input"
                             placeholder="Center Node... (try 'n35')" />
-                        <button class="nyang-button" onclick="centerNode()">Center Node</button>
+                        <button class="nyang-button" style="margin-bottom:0.5em;" onclick="centerNode()">Center Node</button>
+                        <button class="nyang-button" style="margin-bottom:0.5em;" onclick="pinGraph()">Pin Graph</button>
+                        <button class="nyang-button" style="margin-bottom:0.5em;" onclick="resetPins()">Reset Pins</button>
+                        <button class="nyang-button" onclick="togglePinMode()">Toggle Pin Mode</button>
                     </div>
                     <hr />
                     <div>
@@ -325,6 +328,19 @@
             window.graph.toggleMultiplicity()
         }
 
+        function togglePinMode() {
+            window.pinMode = !!!window.pinMode
+            window.graph.setPinMode(window.pinMode)
+        }
+
+        function pinGraph() {
+            window.graph.pinGraph()
+        }
+
+        function resetPins() {
+            window.graph.resetAllPins()
+        }
+
         function highlight() {
             const value = document.getElementById("search-input").value
             if (value && value.length >= 3) {
@@ -386,6 +402,16 @@
                 window.graph.centerNode(value)
             }
         }
+        window.addEventListener("keydown", e => {
+            if(e.shiftKey) {
+                window.graph.setPinMode(true)
+            }
+        })
+        window.addEventListener("keyup", e => {
+            if(!e.shiftKey) {
+                window.graph.setPinMode(false)
+            }
+        })
     </script>
     <script src="./nyang.js"></script>
 </body>

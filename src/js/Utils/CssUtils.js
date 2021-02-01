@@ -76,7 +76,7 @@ const initializeGraphStyles = (style, id) => {
                   background: rgba(0, 0, 0, 0.2);
                 }
                 
-                .nyang-node-edge-counter-badge {
+                .nyang-node-badge {
                   fill: #505759;
                   stroke: none !important;
                 }

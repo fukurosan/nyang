@@ -22,7 +22,19 @@ export default class EntityProcessor {
      * @param {number} x - X coordinate
      * @param {number} y - Y coordinate
      */
-    repositionNode(node: object, x: number, y: number): void;
+    pinNode(node: object, x: number, y: number): void;
+    /**
+     * Repositions a node to given coordinates.
+     * @param {object} node - Node object to be moved
+     * @param {number} newX - Target X coordinate
+     * @param {number} newY - Target Y coordinate
+     */
+    repositionNode(node: object, newX: number, newY: number): Promise<any>;
+    /**
+     * Removes fixation of a node in the graph.
+     * @param {object} node - Node object to be unpinned
+     */
+    unPinNode(node: object): void;
     /**
      * Translates node IDs to index IDs on edge objects. This is essentially only to satisfy the D3 force layout.
      * @param {object[]} edges - Edges to be updated

@@ -12,7 +12,7 @@ declare const EVENTS: Readonly<{
     NODE_DRAG_ENDED: string;
     MOUSE_OVER_NODE: string;
     MOUSE_LEFT_NODE: string;
-    NODE_FIXATION_REQUESTED: string;
+    NODE_PIN_MODE_TOGGLED: string;
     DATA_UPDATE_REQUESTED: string;
     DATASTORE_UPDATED: string;
     DOM_PROCESSOR_FINISHED: string;

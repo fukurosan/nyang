@@ -118,11 +118,28 @@ export class NYANG {
      */
     resetLayout(): void;
     /**
-     * Fixates a node to the center of the graph.
+     * Pins a node to the center of the graph.
      * @param {string} nodeID - ID of the node to center
      * @return {void}
      */
     centerNode(nodeID: string): void;
+    /**
+     * Sets the pin mode for nodes on and off
+     * Pin mode is when nodes are fixated upon drag
+     * @param {boolean} isEnabled
+     * @return {void}
+     */
+    setPinMode(isEnabled: boolean): void;
+    /**
+     * Pins the entire graph
+     * @return {void}
+     */
+    pinGraph(): void;
+    /**
+     * Resets all pins in the graph
+     * @return {void}
+     */
+    resetAllPins(): void;
     /**
      * Implodes/explodes all nodes one step out from the provided node.
      * @param {string} nodeID - ID of the node

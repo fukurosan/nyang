@@ -5130,8 +5130,8 @@
     MOUSE_OVER_NODE: "MOUSE_MOVED_OVER_NODE_EVENT",
     // Params: N/A
     MOUSE_LEFT_NODE: "MOUSE_MOVED_OUTSIDE_NODE_EVENT",
-    // Params: node
-    NODE_FIXATION_REQUESTED: "NODE_FIXATION_REQUESTED",
+    // Params: isEnabled
+    NODE_PIN_MODE_TOGGLED: "NODE_PIN_MODE_TOGGLED",
     // Params: [...nodes], [...edges]
     DATA_UPDATE_REQUESTED: "DATA_UPDATE_REQUESTED",
     // Params: [...nodes], [...edges]
@@ -5183,8 +5183,6 @@
 
   var EntityProcessor = /*#__PURE__*/function () {
     function EntityProcessor(eventEmitter, styles, userDefinedOptions) {
-      var _this = this;
-
       _classCallCheck(this, EntityProcessor);
 
       this.style = styles;
@@ -5192,9 +5190,6 @@
       this.edgeLabelWidth = userDefinedOptions.edgeLabelWidth ? userDefinedOptions.edgeLabelWidth : Env.LABEL_WIDTH;
       this.maxEdgeLabelWidth = userDefinedOptions.maxEdgeLabelWidth ? userDefinedOptions.maxEdgeLabelWidth : Env.LABEL_WIDTH * 2;
       this.ee = eventEmitter;
-      this.ee.on(EVENTS.NODE_FIXATION_REQUESTED, function (node, x, y) {
-        _this.repositionNode(node, x, y);
-      });
     }
     /**
      * Executes the preprocessor for when data is about to go live
@@ -5220,10 +5215,37 @@
        */
 
     }, {
-      key: "repositionNode",
-      value: function repositionNode(node, x, y) {
+      key: "pinNode",
+      value: function pinNode(node, x, y) {
         node.fx = x;
         node.fy = y;
+      }
+      /**
+       * Repositions a node to given coordinates.
+       * @param {object} node - Node object to be moved
+       * @param {number} newX - Target X coordinate
+       * @param {number} newY - Target Y coordinate
+       */
+
+    }, {
+      key: "repositionNode",
+      value: function repositionNode(node, newX, newY) {
+        node.sourceX = node.x;
+        node.sourceY = node.y;
+        node.targetX = newX;
+        node.targetY = newY;
+        return this.animateNodePositions([node]);
+      }
+      /**
+       * Removes fixation of a node in the graph.
+       * @param {object} node - Node object to be unpinned
+       */
+
+    }, {
+      key: "unPinNode",
+      value: function unPinNode(node) {
+        node.fx = null;
+        node.fy = null;
       }
       /**
        * Translates node IDs to index IDs on edge objects. This is essentially only to satisfy the D3 force layout.
@@ -5256,11 +5278,11 @@
     }, {
       key: "updateEdgeDistances",
       value: function updateEdgeDistances(edges) {
-        var _this2 = this;
+        var _this = this;
 
         edges.forEach(function (edge) {
-          if (_this2.style && _this2.style.edges) {
-            var style = _this2.style.edges.find(function (style) {
+          if (_this.style && _this.style.edges) {
+            var style = _this.style.edges.find(function (style) {
               return style.id === edge.type;
             });
 
@@ -5282,28 +5304,28 @@
     }, {
       key: "updateEdgeLabelWidths",
       value: function updateEdgeLabelWidths(edges) {
-        var _this3 = this;
+        var _this2 = this;
 
         edges.forEach(function (edge) {
-          if (_this3.fixedEdgeLabelWidth) {
-            edge.nameToWidth = _this3.edgeLabelWidth;
-            edge.nameFromWidth = _this3.edgeLabelWidth;
+          if (_this2.fixedEdgeLabelWidth) {
+            edge.nameToWidth = _this2.edgeLabelWidth;
+            edge.nameFromWidth = _this2.edgeLabelWidth;
           } else {
             if (edge.nameTo) {
               var width = edge.nameTo.width();
-              width = width < _this3.maxEdgeLabelWidth ? width : _this3.maxEdgeLabelWidth;
+              width = width < _this2.maxEdgeLabelWidth ? width : _this2.maxEdgeLabelWidth;
               edge.nameToWidth = width + Env.EDGE_LABEL_PADDING;
             } else {
-              edge.nameToWidth = _this3.edgeLabelWidth;
+              edge.nameToWidth = _this2.edgeLabelWidth;
             }
 
             if (edge.nameFrom) {
               var _width = edge.nameTo.width();
 
-              _width = _width < _this3.maxEdgeLabelWidth ? _width : _this3.maxEdgeLabelWidth;
+              _width = _width < _this2.maxEdgeLabelWidth ? _width : _this2.maxEdgeLabelWidth;
               edge.nameFromWidth = _width + Env.EDGE_LABEL_PADDING;
             } else {
-              edge.nameFromWidth = _this3.edgeLabelWidth;
+              edge.nameFromWidth = _this2.edgeLabelWidth;
             }
           }
         });
@@ -5358,12 +5380,12 @@
     }, {
       key: "updateNodeParameters",
       value: function updateNodeParameters(nodes) {
-        var _this4 = this;
+        var _this3 = this;
 
         nodes.forEach(function (node) {
           /* Init Radius and max text length values */
-          if (_this4.style && _this4.style.nodes) {
-            var style = _this4.style.nodes.find(function (style) {
+          if (_this3.style && _this3.style.nodes) {
+            var style = _this3.style.nodes.find(function (style) {
               return style.id === node.type;
             });
 
@@ -5435,6 +5457,8 @@
                   node.fy = node.originalFy;
                   delete node.originalFy;
                 }
+
+                delete node.animating;
               });
               resolve();
             } else {
@@ -5456,6 +5480,7 @@
             node.originalFy = node.fy;
             node.fx = node.x;
             node.fy = node.y;
+            node.animating = true;
           });
           tween(Date.now(), Env.IMPLOSION_EXPLOSION_ANIMATION_TIME);
         });
@@ -6567,7 +6592,7 @@
     var cssString = "";
     cssString =
     /*css*/
-    "\n                /* Global Transitions */\n                .nyang * {\n                    transition: fill 0.1s, opacity 0.1s;\n                }\n\n                /* Text */\n                .nyang .multiplicity {\n                    font-size: ".concat(Env.DEFAULT_MULTIPLICITY_FONT_SIZE, ";\n                }     \n\n                /* Tooltip */\n                #nyang-tooltip {\n                  position: absolute;\n                  display: none;\n                  min-width: ").concat(Env.TOOLTIP_MIN_WIDTH, ";\n                  background: ").concat(Env.TOOLTIP_BACKGROUND, ";\n                  opacity: 0.8;\n                  color: ").concat(Env.TOOLTIP_COLOR, ";\n                  padding: 10px;\n                  text-align: center;\n                  max-width: ").concat(Env.TOOLTIP_MAX_WIDTH, ";\n                  word-wrap: break-word;\n                  font-size: 14px;\n                  border-radius: ").concat(Env.TOOLTIP_BORDER_RADIUS, ";\n                }\n\n                /* Context Menu Styles */\n                /* This is a rule for all paths unless specified otherwise */\n                .nyang path {\n                  stroke: #000;\n                  stroke-width: 2px;\n                }\n                \n                .nyang-context-menu {\n                  box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);\n                  position: relative;\n                  display: block;\n                  background: #FFFFFF;\n                }\n                \n                .nyang-context-menu-options {\n                  min-width: 150px;\n                  list-style: none;\n                  padding: 0px;\n                  margin-top: 10px;\n                  margin-bottom: 10px;\n                }\n                \n                .nyang-context-menu-option {\n                  font-size: 14px;\n                  padding: 7px 20px 7px 20px;\n                  cursor: pointer;\n                }\n                \n                .nyang-context-menu-divider {\n                  width: 90%;\n                  height: 1px;\n                  margin-right: 5%;\n                  margin-left: 5%;\n                  margin-top: 8px;\n                  margin-bottom: 8px;\n                  background: #d5d5d5;\n                }\n                \n                .nyang-context-menu-option:hover {\n                  background: rgba(0, 0, 0, 0.2);\n                }\n                \n                .nyang-node-edge-counter-badge {\n                  fill: #505759;\n                  stroke: none !important;\n                }\n                \n                .nyang-node-edge-counter-badge-text {\n                  dominant-baseline: central;\n                  text-anchor: middle;\n                  fill: white;\n                }\n                \n                /* Search Highlighting */\n                .nyang .highlighted-node {\n                  stroke-width: ").concat(Env.HIGHLIGHTING_BORDER_WIDTH, ";\n                  stroke: ").concat(Env.HIGHLIGHTING_BORDER_COLOR, ";\n                  fill: ").concat(Env.HIGHLIGHTING_COLOR, ";\n                  opacity: 0.3;\n                  pointer-events: none;\n                }\n\n                .nyang .disabled {\n                    opacity: ").concat(Env.DEFAULT_FADE_OPACITY, ";\n                    pointer-events: none;\n                }\n\n                /* Default edge style */\n                .edge-path-default{\n                    fill: none;\n                    stroke-width: ").concat(Env.DEFAULT_STROKE_WIDTH, " !important;\n                    stroke-dasharray: ").concat(Env.DEFAULT_EDGE_DASHARRAY, " !important;\n                    stroke: ").concat(Env.DEFAULT_EDGE_COLOR, " !important;\n                }\n                .edge-path-default.hovered{\n                    stroke: ").concat(Env.DEFAULT_LABEL_HOVER_BACKGROUND_COLOR, " !important;\n                }\n                .edge-path-default.focused{\n                    stroke: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                }\n                \n                .label-rect-default{\n                    cursor: pointer;\n                    fill: ").concat(Env.DEFAULT_LABEL_BACKGROUND_COLOR, ";\n                    rx: ").concat(Env.DEFAULT_LABEL_BORDER_RADIUS_X, ";\n                    ry: ").concat(Env.DEFAULT_LABEL_BORDER_RADIUS_Y, ";\n                    stroke: ").concat(Env.DEFAULT_LABEL_BORDER_COLOR, " !important;\n                    stroke-width: ").concat(Env.DEFAULT_LABEL_BORDER_WIDTH, " !important; \n                }\n                .label-rect-default:hover{\n                    fill: ").concat(Env.DEFAULT_LABEL_HOVER_BACKGROUND_COLOR, ";\n                    cursor: pointer;\n                }\n                .label g .label-rect-default.focused {\n                    stroke-width: ").concat(Env.DEFAULT_NODE_FOCUSED_BORDER_WIDTH, " !important;\n                    stroke: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                }\n\n                .label-text-default{\n                    fill: ").concat(Env.DEFAULT_LABEL_TEXT_COLOR, ";\n                    dominant-baseline: central;\n                    pointer-events: none;\n                    font-family: ").concat(Env.DEFAULT_FONT_FAMILY, ";\n                    font-size: ").concat(Env.DEFAULT_FONT_SIZE, ";\n                }\n                .to:hover .label-text-default,\n                .from:hover .label-text-default{\n                    fill: ").concat(Env.DEFAULT_LABEL_TEXT_HOVER_COLOR, "\n                }\n                \n                .marker-default path{\n                    fill: ").concat(Env.DEFAULT_EDGE_COLOR, ";\n                }\n                .marker-default path.hovered{\n                    stroke: ").concat(Env.DEFAULT_LABEL_HOVER_BACKGROUND_COLOR, " !important;\n                    fill: ").concat(Env.DEFAULT_LABEL_HOVER_BACKGROUND_COLOR, " !important;\n                    cursor: pointer;\n                }\n                .marker-default path.focused{\n                    fill: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                    stroke: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                }\n\n                .node, .edge, .multiplicity {\n                    animation: fadeInFromNone 0.2s ease-out;\n                }\n\n                @keyframes fadeInFromNone {\n                    0% {\n                        opacity: 0;\n                    }\n                    100% {\n                        opacity: 1;\n                    }\n                }\n\n                /* Default node values */\n                .node-default {\n                    cursor: pointer;\n                    stroke-width: ").concat(Env.DEFAULT_STROKE_WIDTH, ";\n                    stroke: ").concat(Env.DEFAULT_NODE_STROKE_COLOR, ";\n                    fill: ").concat(Env.DEFAULT_NODE_COLOR, ";\n                    stroke-dasharray: 0;\n                    rx: ").concat(Env.DEFAULT_NODE_BORDER_RADIUS_X, ";\n                    ry: ").concat(Env.DEFAULT_NODE_BORDER_RADIUS_Y, ";\n                }\n                .node-default:hover {\n                    fill: ").concat(Env.DEFAULT_NODE_HOVER_COLOR, ";\n                }\n                .node-text-default {\n                    dominant-baseline: hanging;\n                    pointer-events: none;\n                    font-family: ").concat(Env.DEFAULT_FONT_FAMILY, ";\n                    font-size: ").concat(Env.DEFAULT_FONT_SIZE, ";\n                    fill: ").concat(Env.DEFAULT_NODE_TEXT_COLOR, ";\n                }\n                .node:hover .node-text-default {\n                    fill: ").concat(Env.DEFAULT_NODE_TEXT_HOVER_COLOR, ";\n                }\n                .nyang .node-default.focused {\n                    stroke: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                    stroke-width: ").concat(Env.DEFAULT_NODE_FOCUSED_BORDER_WIDTH, " !important;\n                }\n                ");
+    "\n                /* Global Transitions */\n                .nyang * {\n                    transition: fill 0.1s, opacity 0.1s;\n                }\n\n                /* Text */\n                .nyang .multiplicity {\n                    font-size: ".concat(Env.DEFAULT_MULTIPLICITY_FONT_SIZE, ";\n                }     \n\n                /* Tooltip */\n                #nyang-tooltip {\n                  position: absolute;\n                  display: none;\n                  min-width: ").concat(Env.TOOLTIP_MIN_WIDTH, ";\n                  background: ").concat(Env.TOOLTIP_BACKGROUND, ";\n                  opacity: 0.8;\n                  color: ").concat(Env.TOOLTIP_COLOR, ";\n                  padding: 10px;\n                  text-align: center;\n                  max-width: ").concat(Env.TOOLTIP_MAX_WIDTH, ";\n                  word-wrap: break-word;\n                  font-size: 14px;\n                  border-radius: ").concat(Env.TOOLTIP_BORDER_RADIUS, ";\n                }\n\n                /* Context Menu Styles */\n                /* This is a rule for all paths unless specified otherwise */\n                .nyang path {\n                  stroke: #000;\n                  stroke-width: 2px;\n                }\n                \n                .nyang-context-menu {\n                  box-shadow: 0 4px 5px 3px rgba(0, 0, 0, 0.2);\n                  position: relative;\n                  display: block;\n                  background: #FFFFFF;\n                }\n                \n                .nyang-context-menu-options {\n                  min-width: 150px;\n                  list-style: none;\n                  padding: 0px;\n                  margin-top: 10px;\n                  margin-bottom: 10px;\n                }\n                \n                .nyang-context-menu-option {\n                  font-size: 14px;\n                  padding: 7px 20px 7px 20px;\n                  cursor: pointer;\n                }\n                \n                .nyang-context-menu-divider {\n                  width: 90%;\n                  height: 1px;\n                  margin-right: 5%;\n                  margin-left: 5%;\n                  margin-top: 8px;\n                  margin-bottom: 8px;\n                  background: #d5d5d5;\n                }\n                \n                .nyang-context-menu-option:hover {\n                  background: rgba(0, 0, 0, 0.2);\n                }\n                \n                .nyang-node-badge {\n                  fill: #505759;\n                  stroke: none !important;\n                }\n                \n                .nyang-node-edge-counter-badge-text {\n                  dominant-baseline: central;\n                  text-anchor: middle;\n                  fill: white;\n                }\n                \n                /* Search Highlighting */\n                .nyang .highlighted-node {\n                  stroke-width: ").concat(Env.HIGHLIGHTING_BORDER_WIDTH, ";\n                  stroke: ").concat(Env.HIGHLIGHTING_BORDER_COLOR, ";\n                  fill: ").concat(Env.HIGHLIGHTING_COLOR, ";\n                  opacity: 0.3;\n                  pointer-events: none;\n                }\n\n                .nyang .disabled {\n                    opacity: ").concat(Env.DEFAULT_FADE_OPACITY, ";\n                    pointer-events: none;\n                }\n\n                /* Default edge style */\n                .edge-path-default{\n                    fill: none;\n                    stroke-width: ").concat(Env.DEFAULT_STROKE_WIDTH, " !important;\n                    stroke-dasharray: ").concat(Env.DEFAULT_EDGE_DASHARRAY, " !important;\n                    stroke: ").concat(Env.DEFAULT_EDGE_COLOR, " !important;\n                }\n                .edge-path-default.hovered{\n                    stroke: ").concat(Env.DEFAULT_LABEL_HOVER_BACKGROUND_COLOR, " !important;\n                }\n                .edge-path-default.focused{\n                    stroke: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                }\n                \n                .label-rect-default{\n                    cursor: pointer;\n                    fill: ").concat(Env.DEFAULT_LABEL_BACKGROUND_COLOR, ";\n                    rx: ").concat(Env.DEFAULT_LABEL_BORDER_RADIUS_X, ";\n                    ry: ").concat(Env.DEFAULT_LABEL_BORDER_RADIUS_Y, ";\n                    stroke: ").concat(Env.DEFAULT_LABEL_BORDER_COLOR, " !important;\n                    stroke-width: ").concat(Env.DEFAULT_LABEL_BORDER_WIDTH, " !important; \n                }\n                .label-rect-default:hover{\n                    fill: ").concat(Env.DEFAULT_LABEL_HOVER_BACKGROUND_COLOR, ";\n                    cursor: pointer;\n                }\n                .label g .label-rect-default.focused {\n                    stroke-width: ").concat(Env.DEFAULT_NODE_FOCUSED_BORDER_WIDTH, " !important;\n                    stroke: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                }\n\n                .label-text-default{\n                    fill: ").concat(Env.DEFAULT_LABEL_TEXT_COLOR, ";\n                    dominant-baseline: central;\n                    pointer-events: none;\n                    font-family: ").concat(Env.DEFAULT_FONT_FAMILY, ";\n                    font-size: ").concat(Env.DEFAULT_FONT_SIZE, ";\n                }\n                .to:hover .label-text-default,\n                .from:hover .label-text-default{\n                    fill: ").concat(Env.DEFAULT_LABEL_TEXT_HOVER_COLOR, "\n                }\n                \n                .marker-default path{\n                    fill: ").concat(Env.DEFAULT_EDGE_COLOR, ";\n                }\n                .marker-default path.hovered{\n                    stroke: ").concat(Env.DEFAULT_LABEL_HOVER_BACKGROUND_COLOR, " !important;\n                    fill: ").concat(Env.DEFAULT_LABEL_HOVER_BACKGROUND_COLOR, " !important;\n                    cursor: pointer;\n                }\n                .marker-default path.focused{\n                    fill: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                    stroke: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                }\n\n                .node, .edge, .multiplicity {\n                    animation: fadeInFromNone 0.2s ease-out;\n                }\n\n                @keyframes fadeInFromNone {\n                    0% {\n                        opacity: 0;\n                    }\n                    100% {\n                        opacity: 1;\n                    }\n                }\n\n                /* Default node values */\n                .node-default {\n                    cursor: pointer;\n                    stroke-width: ").concat(Env.DEFAULT_STROKE_WIDTH, ";\n                    stroke: ").concat(Env.DEFAULT_NODE_STROKE_COLOR, ";\n                    fill: ").concat(Env.DEFAULT_NODE_COLOR, ";\n                    stroke-dasharray: 0;\n                    rx: ").concat(Env.DEFAULT_NODE_BORDER_RADIUS_X, ";\n                    ry: ").concat(Env.DEFAULT_NODE_BORDER_RADIUS_Y, ";\n                }\n                .node-default:hover {\n                    fill: ").concat(Env.DEFAULT_NODE_HOVER_COLOR, ";\n                }\n                .node-text-default {\n                    dominant-baseline: hanging;\n                    pointer-events: none;\n                    font-family: ").concat(Env.DEFAULT_FONT_FAMILY, ";\n                    font-size: ").concat(Env.DEFAULT_FONT_SIZE, ";\n                    fill: ").concat(Env.DEFAULT_NODE_TEXT_COLOR, ";\n                }\n                .node:hover .node-text-default {\n                    fill: ").concat(Env.DEFAULT_NODE_TEXT_HOVER_COLOR, ";\n                }\n                .nyang .node-default.focused {\n                    stroke: ").concat(Env.DEFAULT_FOCUS_COLOR, " !important;\n                    stroke-width: ").concat(Env.DEFAULT_NODE_FOCUSED_BORDER_WIDTH, " !important;\n                }\n                ");
 
     if (style && style.nodes) {
       style.nodes.forEach(function (nodeType) {
@@ -7252,11 +7277,15 @@
       this.nodes = [];
       this.edges = [];
       this.listeningForTick = false;
+      this.pinMode = false;
       this.ee = eventEmitter;
       this.ee.on(EVENTS.TOGGLE_MULTIPLICITY_REQUESTED, function () {
         _this.showMultiplicity = !_this.showMultiplicity;
 
         _this.updateMultiplicityCounters(_this.edges);
+      });
+      this.ee.on(EVENTS.NODE_PIN_MODE_TOGGLED, function (isEnabled) {
+        return _this.pinMode = isEnabled;
       });
       this.ee.on(EVENTS.DATASTORE_UPDATED, function (nodes, edges) {
         _this.nodes = nodes;
@@ -7385,6 +7414,7 @@
           //Stop force on start in case it was just a simple click
           _this5.ee.trigger(EVENTS.NODE_DRAG_START, d);
 
+          d.animating = true;
           d.fx = d.x;
           d.fy = d.y;
         }).on("drag", function (d) {
@@ -7394,8 +7424,14 @@
           d.fx = event.x;
           d.fy = event.y;
         }).on("end", function (d) {
-          d.fx = null;
-          d.fy = null;
+          delete d.animating;
+
+          if (!_this5.pinMode) {
+            d.fx = null;
+            d.fy = null;
+          }
+
+          _this5.updateNodes(_this5.nodes);
 
           _this5.ee.trigger(EVENTS.NODE_DRAG_ENDED, d);
         })).each(function (d, i, c) {
@@ -7413,6 +7449,18 @@
             });
 
             _this5.drawNodeCollapsedEdgeCounter(element, node);
+          }
+        }); //Draw pin badge for fixated nodes
+
+        nodes.forEach(function (node) {
+          select("[id='pin-".concat(node.id, "']")).remove();
+
+          if (node.fx && node.fy && !node.animating) {
+            var element = select("[id='".concat(node.id, "']")).select(function () {
+              return this.parentNode;
+            });
+
+            _this5.drawPin(element, node);
           }
         });
         this.nodeElements = this.rootG.select("#node-container").selectAll(".node");
@@ -7757,7 +7805,7 @@
         element.append("tspan").attr("class", "node-text-".concat(type)).attr("x", 0).attr("y", y).text(word);
       }
       /**
-       * Draws a badge in the top right corner of nodes with a number of a hidden edge count in it.
+       * Draws a badge in the bottom right corner of nodes with a number of a hidden edge count in it.
        * @param {D3Selecton} element - Node element selection by D3
        * @param {Object} data - Node data
        */
@@ -7782,9 +7830,33 @@
           return "M".concat(x, ",").concat(y, "\n\t\t\t\th").concat(width - radius, "\n\t\t\t\tq").concat(radius, ",0 ").concat(radius, ",").concat(radius, "\n\t\t\t\tv").concat(height - 2 * radius, "\n\t\t\t\tq0,").concat(radius, " ").concat(-radius, ",").concat(radius, "\n\t\t\t\th").concat(radius * 2 - width, "\n\t\t\t\tq").concat(-radius, ",0 ").concat(-radius, ",").concat(-radius, "\n\t\t\t\tz");
         };
 
-        element.append("g").attr("id", "badge-" + data.id + "-hidden-edge-counter").attr("style", "pointer-events:none;").attr("transform", "translate(".concat(translateX, " ").concat(translateY, ")")).append("path").attr("d", rightTopRoundedRect(-(rectWidth / 2), -(rectHeight / 2), rectWidth, rectHeight, 10)).attr("class", "nyang-node-edge-counter-badge").select(function () {
+        element.append("g").attr("id", "badge-" + data.id + "-hidden-edge-counter").attr("style", "pointer-events:none;").attr("transform", "translate(".concat(translateX, " ").concat(translateY, ")")).append("path").attr("d", rightTopRoundedRect(-(rectWidth / 2), -(rectHeight / 2), rectWidth, rectHeight, 10)).attr("class", "nyang-node-badge").select(function () {
           return this.parentNode;
         }).append("text").attr("class", "nyang-node-edge-counter-badge-text").append("tspan").attr("style", "font-size:".concat(fontSize, ";")).text("".concat(count));
+      }
+      /**
+       * Draws a pin in the top right corner of a node.
+       * @param {D3Selecton} element - Node element selection by D3
+       * @param {Object} data - Node data
+       */
+
+    }, {
+      key: "drawPin",
+      value: function drawPin(element, data) {
+        var areaHeight = data.radius ? data.radius * 2 : data.height;
+        var areaWidth = data.radius ? data.radius * 2 : data.width;
+        var translateY = -(areaHeight / 2);
+        var translateX = areaWidth / 2;
+        var rectHeight = 25;
+        var rectWidth = 25;
+
+        var rightBottomRoundedRect = function rightBottomRoundedRect(x, y, width, height, radius) {
+          return "M".concat(radius, ",").concat(y, "\n\t\t\t\th").concat(width - radius * 2, "\n\t\t\t\tq").concat(radius, ",0 ").concat(radius, ",").concat(radius, "\n\t\t\t\tv").concat(height - 2 * radius, "\n\t\t\t\tq0,").concat(radius, " ").concat(-radius, ",").concat(radius, "\n\t\t\t\th").concat(-width + radius, "\n\t\t\t\tv").concat(-height + radius, "\n\t\t\t\tq0,").concat(-radius, " ").concat(radius, ",").concat(-radius, "\n\t\t\t\tz");
+        };
+
+        element.append("g").attr("id", "pin-" + data.id).attr("style", "pointer-events:none;").attr("transform", "translate(".concat(translateX - rectWidth / 2, " ").concat(translateY, ")")).append("path").attr("d", rightBottomRoundedRect(-(rectWidth / 2), -(rectHeight / 2), rectWidth, rectHeight, 10)).attr("class", "nyang-node-badge").select(function () {
+          return this.parentNode;
+        }).append("path").attr("d", "M24.715,261.811c-5.492,0-10.645-2.133-14.521-6.01c-8.011-8.017-8.011-21.054-0.006-29.064    l70.375-70.372L38.51,113.785c-7.073-7.179-7.928-18.303-2.039-26.466c0.855-1.184,21.314-28.839,58.964-28.839    c2.224,0,4.492,0.101,6.756,0.295L180.62,3.597c8.103-5.729,20.081-4.48,26.863,2.796l44.675,48.037    c6.919,7.436,7.319,19.006,0.926,26.906l-55.882,69.151c1.979,23.759,1.052,63.069-23.901,77.725    c-7.959,4.666-18.578,3.26-25.021-3.282l-38.837-39.316l-70.206,70.183C35.365,259.678,30.208,261.811,24.715,261.811z").attr("style", "fill:#ffffff;transform: scale(0.05) translate(120px, -130px);stroke:#ffffff;");
       }
       /**
        * Creates event listener for onClick events for nodes and edges
@@ -8113,11 +8185,6 @@
       });
       this.ee.on(EVENTS.CLICK_ENTITY, function () {
         _this.alpha(0);
-      });
-      this.ee.on(EVENTS.NODE_FIXATION_REQUESTED, function () {
-        _this.alpha(1);
-
-        _this.restart();
       });
       this.ee.on(EVENTS.ENGINE_LAYOUT_REQUESTED, function (nodes, edges, attribute, filterFunction, sortFunction) {
         _this.createLayout(nodes, edges, attribute, filterFunction, sortFunction);
@@ -8571,7 +8638,7 @@
         this._ee.trigger(EVENTS.ENGINE_LAYOUT_RESET_REQUESTED, this._datastore.nodes, this._datastore.edges);
       }
       /**
-       * Fixates a node to the center of the graph.
+       * Pins a node to the center of the graph.
        * @param {string} nodeID - ID of the node to center
        * @return {void}
        */
@@ -8579,16 +8646,81 @@
     }, {
       key: "centerNode",
       value: function centerNode(nodeID) {
+        var _this2 = this;
+
         var node = this._datastore.nodes.find(function (potentialNode) {
           return potentialNode.id === nodeID;
         });
 
         if (node) {
-          var width = this._UI.rootG.node().getBBox().width / 4;
-          var height = this._UI.rootG.node().getBBox().height / 4;
+          var rootG = this._UI.rootG;
+          var midX = rootG.node().getBBox().x + rootG.node().getBBox().width / 2;
+          var midY = rootG.node().getBBox().y + rootG.node().getBBox().height / 2;
+          node.targetX = midX;
+          node.targetY = midY;
+          node.sourceX = node.x;
+          node.sourceY = node.y;
 
-          this._ee.trigger(EVENTS.NODE_FIXATION_REQUESTED, node, width, height);
+          this._datastore.entityProcessor.animateNodePositions([node]).then(function () {
+            _this2._datastore.entityProcessor.pinNode(node, midX, midY);
+
+            _this2._UI.DOMProcessor.updateNodes(_this2._UI.DOMProcessor.nodes);
+
+            _this2._engine.alpha(1);
+
+            _this2._engine.restart();
+          });
         }
+      }
+      /**
+       * Sets the pin mode for nodes on and off
+       * Pin mode is when nodes are fixated upon drag
+       * @param {boolean} isEnabled
+       * @return {void}
+       */
+
+    }, {
+      key: "setPinMode",
+      value: function setPinMode(isEnabled) {
+        this._ee.trigger(EVENTS.NODE_PIN_MODE_TOGGLED, isEnabled);
+      }
+      /**
+       * Pins the entire graph
+       * @return {void}
+       */
+
+    }, {
+      key: "pinGraph",
+      value: function pinGraph() {
+        var _this3 = this;
+
+        var pins = this._datastore.nodes.map(function (node) {
+          return _this3._datastore.entityProcessor.pinNode(node, node.x, node.y);
+        });
+
+        Promise.all(pins).then(function () {
+          _this3._UI.DOMProcessor.updateNodes(_this3._UI.DOMProcessor.nodes);
+        });
+      }
+      /**
+       * Resets all pins in the graph
+       * @return {void}
+       */
+
+    }, {
+      key: "resetAllPins",
+      value: function resetAllPins() {
+        var _this4 = this;
+
+        this._datastore.allNodes.forEach(function (node) {
+          return _this4._datastore.entityProcessor.unPinNode(node);
+        });
+
+        this._UI.DOMProcessor.updateNodes(this._UI.DOMProcessor.nodes);
+
+        this._engine.alpha(1);
+
+        this._engine.restart(1);
       }
       /**
        * Implodes/explodes all nodes one step out from the provided node.
@@ -8684,13 +8816,13 @@
     }, {
       key: "destroyGraph",
       value: function destroyGraph() {
-        var _this2 = this;
+        var _this5 = this;
 
         //All unmount listeners must be synchronous!!
         this._ee.trigger(EVENTS.GRAPH_WILL_UNMOUNT);
 
         Object.keys(this).forEach(function (key) {
-          delete _this2[key];
+          delete _this5[key];
         });
       }
     }]);
