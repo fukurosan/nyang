@@ -6,7 +6,7 @@ I developed a network graph for [Ortelius](https://www.ortelius.com) called virr
 This repository is a personal version that I keep of the graph to experiment and play around with. For more professional use I strongly suggest you stick to Virrvarr.
 
 <div align="center">
-  <a target="_blank" href="https://fukurosan.github.io/nyang/dist/index.html">Demo</a> | <a target="_blank" href="https://fukurosan.github.io/nyang/docs/dist/index.html">Documentation</a>
+  <a target="_blank" href="https://fukurosan.github.io/nyang/dist/example/index.html">Demo</a> | <a target="_blank" href="https://fukurosan.github.io/nyang/docs/dist/index.html">Documentation</a>
 </div>
 
 ## What is this?
